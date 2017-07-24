@@ -1,5 +1,5 @@
 //
-//  FaceDetect.swift
+//  FaceDetector.swift
 //  Grimace
 //
 //  Created by wzxjiang on 2017/7/20.
@@ -8,7 +8,7 @@
 
 import CoreMedia
 
-public class FaceDetecter<T: Faceable> {
+public class FaceDetector<T: Faceable> {
     
     public typealias Recognize = (CMSampleBuffer) -> [T]
     
