@@ -23,7 +23,7 @@ extension Faceable {
         
         var headBounds = bounds
         
-        headBounds.size.height *= headBounds.size.width/imageSize.width
+        headBounds.size.height = headBounds.size.width * (imageSize.height/imageSize.width)
         
         headBounds.origin.y -= headBounds.size.height
         
