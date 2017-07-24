@@ -54,7 +54,9 @@ class ViewController: UIViewController {
         
         let blendFilter = GPUImageAlphaBlendFilter()
         blendFilter.mix = 1.0
-        
+        blendFilter.frameProcessingCompletionBlock = { [weak self] output, time in
+//            guard let `self` = self else { return }
+        }
         
         element = GPUImageUIElement(view: faceView)
         

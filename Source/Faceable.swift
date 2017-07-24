@@ -6,17 +6,15 @@
 //  Copyright © 2017年 wzxjiang. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import CoreImage
 
 protocol Faceable {
-    var bounds: CGRect { get }
+    var bounds: CGRect { set get }
     
-    var leftEyePosition: CGPoint { get }
+    var leftEyePosition: CGPoint { set get }
     
-    var rightEyePosition: CGPoint { get }
+    var rightEyePosition: CGPoint { set get }
     
-    var mouthPosition: CGPoint { get }
+    var mouthPosition: CGPoint { set get }
 }
-
-extension CIFaceFeature: Faceable {}
