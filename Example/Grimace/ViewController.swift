@@ -17,6 +17,8 @@ class ViewController: UIViewController {
     
     var faceDetector: FaceDetector<Face>!
 
+    var iflyFaceDetector: IFlyFaceDetector!
+    
     var grimace: Grimace!
     
     var sticker = Sticker(headImage: #imageLiteral(resourceName: "Crown"),
@@ -35,12 +37,22 @@ class ViewController: UIViewController {
     
     func setFaceDetector() {
         
-        faceDetector = FaceDetector <Face> { (sampleBuffer) -> [Face] in
-            // sampleBuffer -> [face]
-            // you can use CIDetector or other
+        iflyFaceDetector = IFlyFaceDetector.sharedInstance()
+        
+        faceDetector = FaceDetector <Face> { [weak self] (sampleBuffer) -> [Face] in
+            guard let `self` = self else { return [] }
             
-            // mock
-            return [Face()]
+            guard let imageInfo = sampleBuffer.imageInfo() else { return [] }
+            
+            let faceString =
+                self.iflyFaceDetector.trackFrame(imageInfo.data,
+                                                 withWidth: Int32(imageInfo.size.width),
+                                                 height: Int32(imageInfo.size.height),
+                                                 direction: self.grimace.direction.rawValue)
+            
+            print(faceString ?? "")
+            
+            return faceString?.toFaces(imageSize: imageInfo.size, outputViewSize: self.outputView.bounds.size) ?? []
         }
     }
     
@@ -64,18 +76,83 @@ extension ViewController: GrimaceDelegate {
             self.grimace.set(faces: faces)
         }
     }
-    
-    func didOutputSampleBuffer(_ sampleBuffer: CMSampleBuffer!) {}
 }
 
 struct Face: Faceable {
     var noseBoundsn: CGRect = .zero
-
+    
     var mouthBoundsn: CGRect = .zero
-
+    
     var rightEyeBounds: CGRect = .zero
-
+    
     var leftEyeBounds: CGRect = .zero
-
-    var bounds: CGRect = CGRect(x: (UIScreen.main.bounds.width - 100)/2.0, y: 100, width: 100, height: 100)
+    
+    var bounds: CGRect
+    
+    init?(withPosition position: Position?, imageSize: CGSize, outputViewSize: CGSize) {
+        guard let position = position else { return nil }
+        
+        var widthScale = outputViewSize.width/imageSize.width
+        var heightScale = outputViewSize.height/imageSize.height
+        
+        if widthScale > 1 { widthScale = 1 }
+        
+        if heightScale > 1 { heightScale = 1 }
+        
+        // rotate
+        bounds = CGRect(x: position.top * widthScale,
+                        y: position.left * heightScale,
+                        width: position.bottom - position.top,
+                        height: position.right - position.left)
+    }
 }
+
+struct Position {
+    let left: CGFloat
+    let right: CGFloat
+    let bottom: CGFloat
+    let top: CGFloat
+    
+    init?(withDictionary dictionary: [String: Any]) {
+        
+        guard let left   = dictionary["left"] as? CGFloat,
+            let right  = dictionary["right"] as? CGFloat,
+            let bottom = dictionary["bottom"] as? CGFloat,
+            let top    = dictionary["top"] as? CGFloat else {
+                return nil
+        }
+        
+        self.left = left
+        self.right = right
+        self.bottom = bottom
+        self.top = top
+    }
+}
+
+extension String {
+    func toFaces(imageSize: CGSize, outputViewSize: CGSize) -> [Face] {
+        guard let data = self.data(using: .utf8) else {
+            return []
+        }
+        
+        do {
+            guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return []
+            }
+            
+            guard let faces = json["face"] as? [[String: Any]]else { return [] }
+            
+            return faces.flatMap {
+                guard let dictionary = $0["position"] as? [String: Any] else { return nil }
+                
+                return Face(withPosition: Position(withDictionary: dictionary),
+                            imageSize: imageSize,
+                            outputViewSize: outputViewSize)
+            }
+            
+        } catch _  {
+            return []
+        }
+    }
+}
+

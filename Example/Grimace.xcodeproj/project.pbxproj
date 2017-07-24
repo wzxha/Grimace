@@ -11,6 +11,7 @@
 		1E63C3F21F220E5000F5DF41 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E63C3F11F220E5000F5DF41 /* SystemConfiguration.framework */; };
 		1E63C3F41F220E5600F5DF41 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E63C3F31F220E5600F5DF41 /* libz.tbd */; };
 		1E63C3F61F220E5A00F5DF41 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E63C3F51F220E5A00F5DF41 /* libc++.tbd */; };
+		1E773F4D1F25F55D00E5CC82 /* iflyMSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E773F4C1F25F55D00E5CC82 /* iflyMSC.framework */; };
 		5262ED96167F52033DD7A4B7 /* Pods_Grimace_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7BBB2221951005D3192CFC3B /* Pods_Grimace_Example.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
@@ -24,6 +25,8 @@
 		1E63C3F11F220E5000F5DF41 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		1E63C3F31F220E5600F5DF41 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		1E63C3F51F220E5A00F5DF41 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		1E773F4C1F25F55D00E5CC82 /* iflyMSC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = iflyMSC.framework; sourceTree = "<group>"; };
+		1E773F4E1F25F56300E5CC82 /* Example-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Example-Bridging-Header.h"; sourceTree = "<group>"; };
 		2A43F4B362586F40DBDC357C /* Pods_Grimace_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Grimace_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E20D5E5476A928413ECE7D3 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* Grimace_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Grimace_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -49,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E773F4D1F25F55D00E5CC82 /* iflyMSC.framework in Frameworks */,
 				1E63C3F61F220E5A00F5DF41 /* libc++.tbd in Frameworks */,
 				1E63C3F41F220E5600F5DF41 /* libz.tbd in Frameworks */,
 				1E63C3F21F220E5000F5DF41 /* SystemConfiguration.framework in Frameworks */,
@@ -94,6 +98,8 @@
 		607FACD21AFB9204008FA782 /* Example for Grimace */ = {
 			isa = PBXGroup;
 			children = (
+				1E773F4E1F25F56300E5CC82 /* Example-Bridging-Header.h */,
+				1E773F4C1F25F55D00E5CC82 /* iflyMSC.framework */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
@@ -408,7 +414,7 @@
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Grimace/Example-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -430,7 +436,7 @@
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Grimace/Example-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
