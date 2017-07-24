@@ -48,7 +48,7 @@ public class Grimace: NSObject {
     
     public weak var delegate: GrimaceDelegate?
     
-    public var renderCycleFrame = 1
+    public var renderCycleFrame = 2
     
     public var direction: FaceDirection = .up
     

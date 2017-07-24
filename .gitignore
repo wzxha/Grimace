@@ -90,7 +90,7 @@ fastlane/test_output
 Packages
 .build
 xcuserdata
-*.xcodeproj
+# *.xcodeproj
 
 ### Xcode ###
 # Xcode
@@ -104,7 +104,7 @@ xcuserdata
 ## Other
 
 ### Xcode Patch ###
-*.xcodeproj/*
+# *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
 !*.xcodeproj/xcshareddata/
 !*.xcworkspace/contents.xcworkspacedata

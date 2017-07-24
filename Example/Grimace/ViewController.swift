@@ -51,7 +51,7 @@ class ViewController: UIViewController {
             
             print(faceString ?? "")
             
-            return faceString?.toFaces(imageSize: imageInfo.size) ?? []
+            return faceString?.toFaces(imageSize: imageInfo.size, outputViewSize: self.outputView.bounds.size) ?? []
         }
         
         faceDetector.setParameter("1", forKey: "detect")
@@ -94,11 +94,11 @@ struct Face: Faceable {
 
     var bounds: CGRect
     
-    init?(withPosition position: Position?, imageSize: CGSize) {
+    init?(withPosition position: Position?, imageSize: CGSize, outputViewSize: CGSize) {
         guard let position = position else { return nil }
         
-        var widthScale = UIScreen.main.bounds.width/imageSize.width
-        var heightScale = UIScreen.main.bounds.height/imageSize.height
+        var widthScale = outputViewSize.width/imageSize.width
+        var heightScale = outputViewSize.height/imageSize.height
         
         if widthScale > 1 { widthScale = 1 }
         
@@ -135,7 +135,7 @@ struct Position {
 }
 
 extension String {
-    func toFaces(imageSize: CGSize) -> [Face] {
+    func toFaces(imageSize: CGSize, outputViewSize: CGSize) -> [Face] {
         guard let data = self.data(using: .utf8) else {
             return []
         }
@@ -150,7 +150,9 @@ extension String {
             return faces.flatMap {
                 guard let dictionary = $0["position"] as? [String: Any] else { return nil }
                 
-                return Face(withPosition: Position(withDictionary: dictionary), imageSize: imageSize)
+                return Face(withPosition: Position(withDictionary: dictionary),
+                            imageSize: imageSize,
+                            outputViewSize: outputViewSize)
             }
             
         } catch _  {

@@ -6,6 +6,8 @@
 //
 //
 
+import CoreMedia
+
 extension CMSampleBuffer {
     public func imageInfo() -> (data: Data, size: CGSize)? {
         guard let buffer = CMSampleBufferGetImageBuffer(self) else {
