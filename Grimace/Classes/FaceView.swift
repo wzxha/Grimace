@@ -40,10 +40,20 @@ public class FaceView: UIView {
         guard let sticker = sticker else { return }
         
         if faces.count > 0 {
-            faceImageView.frame = faces[0].bounds
-
+            let face = faces[0]
+            
+            faceImageView.frame = face.bounds
+            
+            leftEyeImageView.frame = face.leftEyeBounds
+            
+            rightEyeImageView.frame = face.rightEyeBounds
+            
+            mouthImageView.frame = face.mouthBounds
+            
+            noseImageView.frame = face.noseBounds
+            
             if let headImage = sticker.headImage {
-                headImageView.frame = faces[0].headBounds(withImageSize: headImage.size)
+                headImageView.frame = face.headBounds(withImageSize: headImage.size)
             }
             
             isHidden = false

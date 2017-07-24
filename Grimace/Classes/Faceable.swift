@@ -13,16 +13,20 @@ public protocol Faceable {
     
     var rightEyeBounds: CGRect { set get }
     
-    var mouthBoundsn: CGRect { set get }
+    var mouthBounds: CGRect { set get }
     
-    var noseBoundsn: CGRect { set get }
+    var noseBounds: CGRect { set get }
 }
 
 extension Faceable {
     func headBounds(withImageSize imageSize: CGSize) -> CGRect {
+        
         var headBounds = bounds
-        headBounds.size.height = imageSize.height * (headBounds.size.width/imageSize.width)
+        
+        headBounds.size.height = headBounds.size.width * (imageSize.height/imageSize.width)
+        
         headBounds.origin.y -= headBounds.size.height
+        
         return headBounds
     }
 }
