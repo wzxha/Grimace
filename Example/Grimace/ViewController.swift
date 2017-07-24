@@ -69,9 +69,9 @@ extension ViewController: GrimaceDelegate {
 }
 
 struct Face: Faceable {
-    var noseBoundsn: CGRect = .zero
+    var noseBounds: CGRect = .zero
 
-    var mouthBoundsn: CGRect = .zero
+    var mouthBounds: CGRect = .zero
 
     var rightEyeBounds: CGRect = .zero
 
