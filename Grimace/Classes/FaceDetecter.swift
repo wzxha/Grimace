@@ -10,17 +10,17 @@ import CoreMedia
 
 public class FaceDetecter<T: Faceable> {
     
-    public typealias Recognition = (CMSampleBuffer) -> [T]
+    public typealias Recognize = (CMSampleBuffer) -> [T]
     
     public typealias Handle = ([T]) -> Void
     
-    private let recognition: Recognition
+    private let recognize: Recognize
     
-    public init(_ recognition: @escaping Recognition) {
-        self.recognition = recognition
+    public init(_ recognition: @escaping Recognize) {
+        self.recognize = recognition
     }
     
     public func detect(_ sampleBuffer: CMSampleBuffer!, handle: Handle) {
-        handle(recognition(sampleBuffer))
+        handle(recognize(sampleBuffer))
     }
 }

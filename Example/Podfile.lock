@@ -1,12 +1,19 @@
 PODS:
   - GPUImage (0.1.7)
+  - Grimace (0.1.0):
+    - GPUImage
 
 DEPENDENCIES:
-  - GPUImage
+  - Grimace (from `../`)
+
+EXTERNAL SOURCES:
+  Grimace:
+    :path: ../
 
 SPEC CHECKSUMS:
   GPUImage: 733a5f0fab92df9de1c37ba9df520a833ccb406d
+  Grimace: 300106656c0dd2ac9618353630f18de5a664accc
 
-PODFILE CHECKSUM: 589e0c9aad0a33544bc723e9d5496a2f86c0c3f9
+PODFILE CHECKSUM: ed8798125440172ac2d8c0c15b5f57b10310da12
 
 COCOAPODS: 1.2.1
