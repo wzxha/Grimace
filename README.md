@@ -1,4 +1,4 @@
-# Grimace [![CI Status](http://img.shields.io/travis/Wzxhaha/Grimace.svg?style=flat)](https://travis-ci.org/Wzxhaha/Grimace)[![Version](https://img.shields.io/cocoapods/v/Grimace.svg?style=flat)](http://cocoapods.org/pods/Grimace)[![License](https://img.shields.io/cocoapods/l/Grimace.svg?style=flat)](http://cocoapods.org/pods/Grimace)[![Platform](https://img.shields.io/cocoapods/p/Grimace.svg?style=flat)](http://cocoapods.org/pods/Grimace)
+# Grimace [![CI Status](http://img.shields.io/travis/Wzxhaha/Grimace.svg?style=flat)](https://travis-ci.org/Wzxhaha/Grimace) [![Version](https://img.shields.io/cocoapods/v/Grimace.svg?style=flat)](http://cocoapods.org/pods/Grimace) [![License](https://img.shields.io/cocoapods/l/Grimace.svg?style=flat)](http://cocoapods.org/pods/Grimace) [![Platform](https://img.shields.io/cocoapods/p/Grimace.svg?style=flat)](http://cocoapods.org/pods/Grimace)
 Make it easier to use face stickers
 
 
