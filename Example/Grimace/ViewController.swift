@@ -39,6 +39,9 @@ class ViewController: UIViewController {
         
         iflyFaceDetector = IFlyFaceDetector.sharedInstance()
         
+        iflyFaceDetector.setParameter("1", forKey: "align")
+        iflyFaceDetector.setParameter("1", forKey: "detect")
+        
         faceDetector = FaceDetector <Face> { [weak self] (sampleBuffer) -> [Face] in
             guard let `self` = self else { return [] }
             
