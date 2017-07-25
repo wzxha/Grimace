@@ -88,6 +88,12 @@ public class Grimace: NSObject {
         setupFilter()
     }
     
+    deinit {
+        motionManager.stopAccelerometerUpdates()
+        
+        stopCapture()
+    }
+    
     func setupVideoCapture() {
         videoCapture.addAudioInputsAndOutputs()
         
