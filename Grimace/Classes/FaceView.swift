@@ -37,35 +37,51 @@ public class FaceView: UIView {
     }
     
     func set(faces: [Faceable]) {
-        guard let sticker = sticker else { return }
         
         if faces.count > 0 {
             let face = faces[0]
             
-            faceImageView.frame = face.bounds
-            
-            leftEyeImageView.frame = face.leftEyeBounds
-            
-            rightEyeImageView.frame = face.rightEyeBounds
-            
-            mouthImageView.frame = face.mouthBounds
-            
-            noseImageView.frame = face.noseBounds
-            
-            if let headImage = sticker.headImage {
-                headImageView.frame = face.headBounds(withImageSize: headImage.size)
+            guard face.bounds.width/bounds.width > 0.1, face.bounds.height/bounds.height > 0.1 else {
+                return
             }
             
-            isHidden = false
+            show(face)
         } else {
-            if count > 5 {
-                isHidden = true
-                count = 0
-            }
-            count += 1
+            
+            dismiss()
         }
         
         self.setNeedsDisplay()
+    }
+    
+    private func show(_ face: Faceable) {
+        
+        faceImageView.frame = face.bounds
+        
+        leftEyeImageView.frame = face.leftEyeBounds
+        
+        rightEyeImageView.frame = face.rightEyeBounds
+        
+        mouthImageView.frame = face.mouthBounds
+        
+        noseImageView.frame = face.noseBounds
+        
+        if let headImage = sticker?.headImage {
+            headImageView.frame = face.headBounds(withImageSize: headImage.size)
+        }
+        
+        isHidden = false
+    }
+    
+    private func dismiss() {
+        
+        if count > 5 {
+            
+            isHidden = true
+            
+            count = 0
+        }
+        count += 1
     }
     
     private func set(sticker: Sticker?) {
