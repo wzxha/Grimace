@@ -56,7 +56,9 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: GrimaceDelegate {
-    func willOutputSampleBuffer(_ sampleBuffer: CMSampleBuffer!) {
+    func mixedOutput(imageFramebuffer: GPUImageFramebuffer!) {}
+
+    func willOutput(sampleBuffer: CMSampleBuffer!) {
         faceDetector.detect(sampleBuffer) { [weak self] faces in
             
             guard let `self` = self else { return }
@@ -65,7 +67,6 @@ extension ViewController: GrimaceDelegate {
         }
     }
     
-    func didOutputSampleBuffer(_ sampleBuffer: CMSampleBuffer!) {}
 }
 
 struct Face: Faceable {
