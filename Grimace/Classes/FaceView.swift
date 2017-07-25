@@ -41,11 +41,10 @@ public class FaceView: UIView {
         if faces.count > 0 {
             let face = faces[0]
             
-            guard face.bounds.width/bounds.width > 0.1, face.bounds.height/bounds.height > 0.1 else {
-                return
+            if face.bounds.width/bounds.width > 0.1, face.bounds.height/bounds.height > 0.1 {
+                show(face)
             }
             
-            show(face)
         } else {
             
             dismiss()
