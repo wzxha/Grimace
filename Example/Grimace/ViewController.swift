@@ -56,7 +56,7 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: GrimaceDelegate {
-    func mixedOutput(imageFramebuffer: GPUImageFramebuffer!) {}
+    func mixedOutput(imageFramebuffer: GPUImageFramebuffer!, timestamp: CFTimeInterval) {}
 
     func willOutput(sampleBuffer: CMSampleBuffer!) {
         faceDetector.detect(sampleBuffer) { [weak self] faces in
