@@ -45,20 +45,18 @@ class ViewController: UIViewController {
     }
     
     func setupVideoCamera() {
-        grimace = Grimace(outputView: outputView, sessionPreset: .preset640x480)
+        grimace = Grimace(outputView: outputView, sessionPreset: .preset640x480, delegate: nil)
         
         grimace.set(sticker: sticker)
-        
-        grimace.delegate = self
         
         grimace.startCapture()
     }
 }
 
 extension ViewController: GrimaceDelegate {
-    func mixedOutput(imageFramebuffer: GPUImageFramebuffer!, timestamp: CFTimeInterval) {}
+    func mixedOutput(imageFramebuffer: CVPixelBuffer, timestamp: CFTimeInterval) {}
 
-    func willOutput(sampleBuffer: CMSampleBuffer!) {
+    func willOutput(sampleBuffer: CMSampleBuffer) {
         faceDetector.detect(sampleBuffer) { [weak self] faces in
             
             guard let `self` = self else { return }
