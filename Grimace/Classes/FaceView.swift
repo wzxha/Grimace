@@ -23,8 +23,8 @@ public class FaceView: UIView {
     private let noseImageView = UIImageView()
     private let mouthImageView = UIImageView()
     
-    init(withSuperView superView: UIView) {
-        super.init(frame: superView.bounds)
+    init(superViewSize size: CGSize) {
+        super.init(frame: CGRect.init(origin: .zero, size: size))
         
         self.isHidden = true
         

@@ -35,49 +35,95 @@ public enum SessionPreset {
             return AVCaptureSessionPreset1920x1080
         }
     }
+    
+    var size: CGSize {
+        switch self {
+        case .preset640x480:
+            return CGSize(width: 640, height: 480)
+        case .preset1280x720:
+            return CGSize(width: 1280, height: 720)
+        case .preset1920x1080:
+            return CGSize(width: 1920, height: 1080)
+        }
+    }
 }
 
 public protocol GrimaceDelegate: class {
-    func willOutput(sampleBuffer: CMSampleBuffer!)
+    func willOutput(sampleBuffer: CMSampleBuffer)
     
-    func mixedOutput(imageFramebuffer: GPUImageFramebuffer!, timestamp: CFTimeInterval)
+    func mixedOutput(imageFramebuffer: CVPixelBuffer, timestamp: CFTimeInterval)
 }
 
 public class Grimace: NSObject {
     public typealias Camera = AVCaptureDevicePosition
     
-    public weak var delegate: GrimaceDelegate?
-    
-    public var renderCycleFrame = 2
-    
+    public var pixelFormatType: OSType = kCVPixelFormatType_32BGRA
+        
     public var direction: FaceDirection = .up
     
     fileprivate let faceView: FaceView
     
-    fileprivate var currentRenderFrame = 0
+    private var videoCapture: GPUImageVideoCamera?
     
-    private let videoCapture: GPUImageVideoCamera
+    private var outputView: GPUImageView?
     
+    private var motionManager: CMMotionManager?
+    
+    private var sessionPreset: SessionPreset
+    
+    private var currentCamera: Camera = .front
+    
+    private var dataOutput: GPUImageRawDataOutput?
+    
+    fileprivate weak var delegate: GrimaceDelegate?
+    
+    // filter
     private let element: GPUImageUIElement
     
-    private let outputView: GPUImageView
+    private let filter = GPUImageFilter()
     
-    private let motionManager: CMMotionManager
+    private let blendFilter = GPUImageAlphaBlendFilter()
     
-    private var currentCamera: Camera
-    
-    public init(outputView: GPUImageView, sessionPreset: SessionPreset = .preset640x480, camera: Camera = .front) {
-        self.outputView = outputView
+    public init(input: GPUImageRawDataInput, outputViewSize: CGSize, sessionPreset: SessionPreset = .preset640x480, delegate: GrimaceDelegate?) {
+        self.sessionPreset = sessionPreset
         
-        faceView = FaceView(withSuperView: outputView)
-
+        faceView = FaceView(superViewSize: outputViewSize)
+        
         element = GPUImageUIElement(view: faceView)
         
-        videoCapture = GPUImageVideoCamera(sessionPreset: sessionPreset.string, cameraPosition: camera)
-     
-        motionManager = CMMotionManager()
+        self.delegate = delegate
         
-        currentCamera = camera
+        super.init()
+        
+        setupFilter()
+        
+        // pipeline
+        
+        input.addTarget(filter)
+        
+        filter.addTarget(blendFilter)
+        
+        element.addTarget(blendFilter)
+        
+        blendFilter.addTarget(outputView)
+        
+        guard delegate != nil else { return }
+        
+        setupDataOutput()
+        
+        blendFilter.addTarget(dataOutput)
+    }
+    
+    public init(outputView: GPUImageView, sessionPreset: SessionPreset = .preset640x480, delegate: GrimaceDelegate?) {
+        self.sessionPreset = sessionPreset
+        
+        self.outputView = outputView
+        
+        faceView = FaceView(superViewSize: outputView.bounds.size)
+        
+        element = GPUImageUIElement(view: faceView)
+    
+        self.delegate = delegate
         
         super.init()
         
@@ -86,15 +132,35 @@ public class Grimace: NSObject {
         setupVideoCapture()
         
         setupFilter()
+        
+        // pipeline
+        videoCapture!.addTarget(filter)
+        
+        filter.addTarget(blendFilter)
+        
+        element.addTarget(blendFilter)
+        
+        blendFilter.addTarget(outputView)
+        
+        guard delegate != nil else { return }
+        
+        setupDataOutput()
+        
+        blendFilter.addTarget(dataOutput)
     }
     
     deinit {
-        motionManager.stopAccelerometerUpdates()
+        motionManager?.stopAccelerometerUpdates()
         
         stopCapture()
     }
     
     func setupVideoCapture() {
+        
+        videoCapture = GPUImageVideoCamera(sessionPreset: sessionPreset.string, cameraPosition: currentCamera)
+        
+        guard let videoCapture = videoCapture else { return }
+        
         videoCapture.addAudioInputsAndOutputs()
         
         videoCapture.horizontallyMirrorRearFacingCamera = false
@@ -107,8 +173,15 @@ public class Grimace: NSObject {
     }
     
     func setupMotion() {
+        
+        motionManager = CMMotionManager()
+        
+        guard let motionManager = motionManager else { return }
+
         motionManager.accelerometerUpdateInterval = 0.2
+        
         motionManager.gyroUpdateInterval = 0.2
+        
         motionManager.startAccelerometerUpdates(to: OperationQueue.current!) { [weak self] accelerometerData, error in
             guard error == nil,
                 let accelerometerData = accelerometerData,
@@ -130,7 +203,6 @@ public class Grimace: NSObject {
     
     func setupFilter() {
         
-        let filter = GPUImageFilter()
         filter.frameProcessingCompletionBlock = { [weak self] output, time in
             guard let `self` = self else { return }
             
@@ -138,34 +210,60 @@ public class Grimace: NSObject {
                 self.element.update(withTimestamp: time)
             }
         }
-        videoCapture.addTarget(filter)
         
-        let blendFilter = GPUImageAlphaBlendFilter()
         blendFilter.mix = 1.0
-        blendFilter.frameProcessingCompletionBlock = { [weak self] output, time in
+    }
+    
+    func setupDataOutput() {
+        let dataOutput = GPUImageRawDataOutput(imageSize: sessionPreset.size, resultsInBGRAFormat: true)
+
+        dataOutput?.newFrameAvailableBlock = { [weak self] in
             guard let `self` = self else { return }
-            
-            guard let output = output else { return }
-            
+
             guard let delegate = self.delegate else { return }
+
+            guard let dataOutput = self.dataOutput else { return }
+
+            dataOutput.lockFramebufferForReading()
+
+            var outBytes = dataOutput.rawBytesForImage
+            let bytesPerRow = dataOutput.bytesPerRowInOutput()
+            var pixelBuffer: CVPixelBuffer? = nil
+            let ret =
+                CVPixelBufferCreateWithBytes(
+                    kCFAllocatorDefault,
+                    Int(self.sessionPreset.size.width),
+                    Int(self.sessionPreset.size.height),
+                    self.pixelFormatType,
+                    &outBytes,
+                    Int(bytesPerRow),
+                    nil,
+                    nil,
+                    nil,
+                    &pixelBuffer
+                )
             
-            // TODO: - try set GPUImageFramebuffer to samplebuffer
-            delegate.mixedOutput(imageFramebuffer: output.framebufferForOutput(), timestamp: CACurrentMediaTime())
+            dataOutput.unlockFramebufferAfterReading()
+
+            guard ret == kCVReturnSuccess else { return }
+            
+            guard let buffer = pixelBuffer else { return }
+            
+            delegate.mixedOutput(imageFramebuffer: buffer, timestamp: CACurrentMediaTime())
         }
-        
-        filter.addTarget(blendFilter)
-        element.addTarget(blendFilter)
-        
-        blendFilter.addTarget(outputView)
     }
     
     public func startCapture(_ camera: Camera = .front) {
+        guard let videoCapture = videoCapture else { return }
+        
         currentCamera = camera
         
         videoCapture.startCapture()
     }
     
     public func stopCapture() {
+        guard let videoCapture = videoCapture else { return }
+        
         videoCapture.stopCapture()
         
         videoCapture.removeAllTargets()
@@ -183,12 +281,6 @@ public class Grimace: NSObject {
 extension Grimace: GPUImageVideoCameraDelegate {
 
     public func willOutputSampleBuffer(_ sampleBuffer: CMSampleBuffer!) {
-        currentRenderFrame += 1
-        
-        guard currentRenderFrame >= renderCycleFrame else { return }
-        
-        currentRenderFrame = 0
-        
         guard let delegate = delegate else { return }
         
         delegate.willOutput(sampleBuffer: sampleBuffer)
