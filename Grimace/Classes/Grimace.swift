@@ -38,9 +38,9 @@ public enum SessionPreset {
 }
 
 public protocol GrimaceDelegate: class {
-    func willOutputSampleBuffer(_ sampleBuffer: CMSampleBuffer!)
+    func willOutput(sampleBuffer: CMSampleBuffer!)
     
-//    func didOutputSampleBuffer(_ sampleBuffer: CMSampleBuffer!)
+    func mixedOutput(imageFramebuffer: GPUImageFramebuffer!, timestamp: CFTimeInterval)
 }
 
 public class Grimace: NSObject {
@@ -145,10 +145,12 @@ public class Grimace: NSObject {
         blendFilter.frameProcessingCompletionBlock = { [weak self] output, time in
             guard let `self` = self else { return }
             
-            guard self.delegate != nil else { return }
+            guard let output = output else { return }
+            
+            guard let delegate = self.delegate else { return }
             
             // TODO: - try set GPUImageFramebuffer to samplebuffer
-//            delegate.didOutputSampleBuffer(output)
+            delegate.mixedOutput(imageFramebuffer: output.framebufferForOutput(), timestamp: CACurrentMediaTime())
         }
         
         filter.addTarget(blendFilter)
@@ -189,6 +191,6 @@ extension Grimace: GPUImageVideoCameraDelegate {
         
         guard let delegate = delegate else { return }
         
-        delegate.willOutputSampleBuffer(sampleBuffer)
+        delegate.willOutput(sampleBuffer: sampleBuffer)
     }
 }
